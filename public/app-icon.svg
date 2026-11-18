@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 512 512"
+   version="1.1"
+   id="svg3"
+   sodipodi:docname="gemini-svg.svg"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs3" />
+  <sodipodi:namedview
+     id="namedview3"
+     pagecolor="#ffffff"
+     bordercolor="#999999"
+     borderopacity="1"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="0.80585314"
+     inkscape:cx="358.00568"
+     inkscape:cy="552.83026"
+     inkscape:window-width="1125"
+     inkscape:window-height="1211"
+     inkscape:window-x="1554"
+     inkscape:window-y="140"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg3" />
+  <rect
+     width="512"
+     height="512"
+     rx="112"
+     fill="#d97706"
+     id="rect1" />
+  <path
+     d="m 247.31356,67.458819 c -14.75865,67.352631 -128,156.805121 -144,252.805121 -12.000002,72 44,128 144,128 100,0 156,-56 144,-128 -16,-96 -127.10202,-329.920817 -144,-252.805121 z"
+     fill="#fef3c7"
+     id="path1"
+     sodipodi:nodetypes="sssss" />
+  <circle
+     cx="198.62711"
+     cy="289.7821"
+     r="16"
+     fill="#d97706"
+     id="circle1" />
+  <circle
+     cx="299.72275"
+     cy="292.13196"
+     r="16"
+     fill="#d97706"
+     id="circle2" />
+  <circle
+     cx="270.89102"
+     cy="363.50488"
+     r="16"
+     fill="#d97706"
+     id="circle3" />
+</svg>
