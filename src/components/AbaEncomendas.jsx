@@ -8,6 +8,7 @@ export default function AbaEncomendas() {
   const [filtro, setFiltro] = useState('confirmada')
   const [modalAberto, setModalAberto] = useState(false)
 
+  // Dados do cliente/pedido
   const [clienteNome, setClienteNome] = useState('')
   const [clienteTelefone, setClienteTelefone] = useState('')
   const [dataDia, setDataDia] = useState('')
@@ -16,11 +17,13 @@ export default function AbaEncomendas() {
   const [obs, setObs] = useState('')
   const [salvando, setSalvando] = useState(false)
 
+  // Estados do seletor de item atual
   const [tipoSelecionado, setTipoSelecionado] = useState('')
   const [saborIdSelecionado, setSaborIdSelecionado] = useState('')
   const [qtdSelecionada, setQtdSelecionada] = useState('')
   const [usarEstoqueSelecionado, setUsarEstoqueSelecionado] = useState(true)
 
+  // Carrinho de itens adicionados ao pedido
   const [itensCarrinho, setItensCarrinho] = useState([])
 
   const carregar = async () => {
@@ -210,6 +213,44 @@ export default function AbaEncomendas() {
     else carregar()
   }
 
+  const confirmarEntrega = async (enc) => {
+    const total = Number(enc.valor_total)
+    const pago = Number(enc.valor_pago || 0)
+    const falta = Math.max(0, total - pago)
+
+    if (falta > 0) {
+      const quitarAgora = window.confirm(
+        `⚠️ Atenção: Ainda falta receber R$ ${falta.toFixed(2)} de ${enc.cliente_nome}.\n\n` +
+        `• Clique em OK para QUITAR os R$ ${falta.toFixed(2)} e marcar como ENTREGUE.\n` +
+        `• Clique em CANCELAR se não quiser concluir a entrega agora.`
+      )
+      if (!quitarAgora) return
+
+      const { error } = await supabase
+        .from('encomendas')
+        .update({
+          status: 'entregue',
+          valor_pago: total,
+          status_pagamento: 'pago',
+        })
+        .eq('id', enc.id)
+
+      if (error) alert(error.message)
+      else carregar()
+      return
+    }
+
+    if (!window.confirm(`Confirmar entrega do pedido de ${enc.cliente_nome}?`)) return
+
+    const { error } = await supabase
+      .from('encomendas')
+      .update({ status: 'entregue' })
+      .eq('id', enc.id)
+
+    if (error) alert(error.message)
+    else carregar()
+  }
+
   const atualizarStatus = async (id, campo, valor, confirmMsg) => {
     if (confirmMsg && !window.confirm(confirmMsg)) return
     const { error } = await supabase.from('encomendas').update({ [campo]: valor }).eq('id', id)
@@ -255,6 +296,7 @@ export default function AbaEncomendas() {
 
   return (
     <div className="space-y-4">
+      {/* Filtros */}
       <div className="flex gap-1.5 overflow-x-auto pb-1">
         {[
           { id: 'confirmada', label: 'Ativas' },
@@ -276,6 +318,7 @@ export default function AbaEncomendas() {
         ))}
       </div>
 
+      {/* Lista de Encomendas */}
       <div className="space-y-3">
         {encomendas.map((enc) => {
           const total = Number(enc.valor_total)
@@ -350,7 +393,7 @@ export default function AbaEncomendas() {
                     </button>
                   )}
                   <button
-                    onClick={() => atualizarStatus(enc.id, 'status', 'entregue')}
+                    onClick={() => confirmarEntrega(enc)}
                     className="flex items-center justify-center gap-1 py-1.5 text-xs font-medium bg-blue-50 text-blue-700 rounded-lg border border-blue-200"
                   >
                     <Truck className="w-3.5 h-3.5" /> Entregue
@@ -381,6 +424,7 @@ export default function AbaEncomendas() {
         })}
       </div>
 
+      {/* Botão Flutuante */}
       <button
         onClick={abrirModal}
         className="fixed bottom-20 right-4 bg-amber-600 text-white p-4 rounded-full shadow-lg flex items-center gap-2 font-semibold text-sm"
@@ -388,6 +432,7 @@ export default function AbaEncomendas() {
         <Plus className="w-5 h-5" /> Nova Encomenda
       </button>
 
+      {/* Modal Nova Encomenda */}
       {modalAberto && (
         <div className="fixed inset-0 bg-black/50 z-30 flex items-end sm:items-center justify-center">
           <form
@@ -401,6 +446,7 @@ export default function AbaEncomendas() {
               </button>
             </div>
 
+            {/* 1. Cliente e Entrega */}
             <input
               required
               placeholder="Nome do Cliente"
@@ -476,6 +522,7 @@ export default function AbaEncomendas() {
               className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm"
             />
 
+            {/* 2. Seletor Compacto de Item */}
             <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2.5">
               <p className="text-xs font-bold text-slate-700">Adicionar Item ao Pedido</p>
 
@@ -556,6 +603,7 @@ export default function AbaEncomendas() {
               </div>
             </div>
 
+            {/* 3. Lista de Itens Adicionados */}
             {itensCarrinho.length > 0 && (
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center text-xs font-semibold text-slate-600">
@@ -601,6 +649,7 @@ export default function AbaEncomendas() {
               </div>
             )}
 
+            {/* 4. Resumo Final + Sinal / Pagamento no Final */}
             {itensCarrinho.length > 0 && (
               <div className="bg-amber-50/70 border border-amber-200 rounded-xl p-3 space-y-2.5">
                 <div className="flex justify-between items-center border-b border-amber-200/70 pb-2">
