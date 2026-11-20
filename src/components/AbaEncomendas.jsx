@@ -29,7 +29,7 @@ export default function AbaEncomendas() {
   const carregar = async () => {
     let query = supabase
       .from('encomendas')
-      .select('*, encomenda_itens(quantidade, preco_unitario, usar_estoque, sabores(tipo, nome))')
+      .select('*, encomenda_itens(id, feito, quantidade, preco_unitario, usar_estoque, sabores(tipo, nome))')
       .order('data_entrega', { ascending: true })
 
     if (filtro === 'pendentes_pgto') {
@@ -213,6 +213,16 @@ export default function AbaEncomendas() {
     else carregar()
   }
 
+  const alternarItemFeito = async (item) => {
+    const { error } = await supabase
+      .from('encomenda_itens')
+      .update({ feito: !item.feito })
+      .eq('id', item.id)
+
+    if (error) alert(error.message)
+    else carregar()
+  }
+
   const confirmarEntrega = async (enc) => {
     const total = Number(enc.valor_total)
     const pago = Number(enc.valor_pago || 0)
@@ -364,15 +374,24 @@ export default function AbaEncomendas() {
                       <span>
                         <strong>{item.quantidade}x</strong> {item.sabores?.tipo} - {item.sabores?.nome}
                       </span>
-                      <span
-                        className={`text-[9px] font-bold px-1.5 py-0.2 rounded uppercase ${
-                          item.usar_estoque
-                            ? 'bg-emerald-100 text-emerald-800'
-                            : 'bg-purple-100 text-purple-800'
-                        }`}
-                      >
-                        {item.usar_estoque ? 'Estoque' : 'A Fazer'}
-                      </span>
+                      {item.usar_estoque ? (
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase bg-emerald-100 text-emerald-800">
+                          Estoque
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => alternarItemFeito(item)}
+                          title="Toque para alternar entre A Fazer e Feito"
+                          className={`text-[9px] font-bold px-1.5 py-0.5 rounded uppercase cursor-pointer ${
+                            item.feito
+                              ? 'bg-teal-100 text-teal-800 border border-teal-300'
+                              : 'bg-purple-100 text-purple-800 border border-purple-300'
+                          }`}
+                        >
+                          {item.feito ? '✓ Feito' : 'A Fazer'}
+                        </button>
+                      )}
                     </div>
                     <span className="text-slate-500">
                       R$ {(item.quantidade * item.preco_unitario).toFixed(2)}
